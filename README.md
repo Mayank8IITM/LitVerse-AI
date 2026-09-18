@@ -9,12 +9,13 @@
 Our platform was built on the foundation of the latest educational and cognitive science research (2024-2025):
 
 1. **The Zone of Proximal Development (ZPD)**: Research shows learning is maximized when material is *just beyond* current ability. Static reading levels are too coarse. _(**Vygotsky, L. S., "Mind in Society"** & **Educational Research Review, 2024**)_
+
    * **Our Solution**: An **Adaptive Difficulty Engine** that dynamically adjusts passage difficulty, vocabulary, and sentence structure in real-time based on multidimensional performance tracking.
-2. **"Cognitive Offloading" & Over-reliance on AI**: APA studies show kids perform tasks without encoding knowledge if AI gives direct answers. _(**American Psychological Association Cognitive Offloading Studies, 2025**)_
+3. **"Cognitive Offloading" & Over-reliance on AI**: APA studies show kids perform tasks without encoding knowledge if AI gives direct answers. _(**American Psychological Association Cognitive Offloading Studies, 2025**)_
    * **Our Solution**: **Pip**, our AI reading coach, acts as a scaffold. Pip NEVER gives the direct answer. Pip asks guiding questions and explains *why* an answer is right or wrong in simple, kid-friendly language.
-3. **Intrinsic Motivation vs Extrinsic Rewards**: Self-Determination Theory proves intrinsic motivation produces 4x more durable engagement than extrinsic rewards (like digital coins). _(**Deci, E. L., & Ryan, R. M., "Self-Determination Theory"**)_
+4. **Intrinsic Motivation vs Extrinsic Rewards**: Self-Determination Theory proves intrinsic motivation produces 4x more durable engagement than extrinsic rewards (like digital coins). _(**Deci, E. L., & Ryan, R. M., "Self-Determination Theory"**)_
    * **Our Solution**: **AI-Generated Branching Stories**. The child's choices affect the narrative. Their reading literally brings the world to life.
-4. **Parental Involvement**: The #1 predictor of reading success is parental involvement, but parents don't know *how* to help. _(**NIH & Dept of Education Longitudinal Literacy Studies**)_
+5. **Parental Involvement**: The #1 predictor of reading success is parental involvement, but parents don't know *how* to help. _(**NIH & Dept of Education Longitudinal Literacy Studies**)_
    * **Our Solution**: **AI-Powered Parent Reports**. Our dashboard uses Gemini to generate actionable, natural-language weekly summaries and suggests some small activities based on the child's specific weaker areas.
 
 ---
