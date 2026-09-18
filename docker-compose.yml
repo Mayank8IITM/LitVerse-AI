@@ -27,12 +27,14 @@ services:
       - db
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend
+      args:
+        NEXT_PUBLIC_API_URL: http://ec2-3-90-184-59.compute-1.amazonaws.com:8000
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID: 166375501738-3autp0g3onnu8cmvnl7rvtkbt52bfipt.apps.googleusercontent.com
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - NEXT_PUBLIC_API_URL=http://your-ec2-ip-address:8000
     depends_on:
       - backend
 
