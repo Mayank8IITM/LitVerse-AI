@@ -21,6 +21,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from app.db.database import Base
 from app.models.user import User
 from app.models.child import Child, LearnerModel, ChallengeAttempt
+from app.models.story import StorySession, StoryNode
+from app.models.vocab import VocabWord
 from app.core.config import settings
 
 config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)

@@ -10,7 +10,44 @@ from app.models.user import User
 from app.core.config import settings
 from app.core.security import create_access_token
 
+from fastapi.security import OAuth2PasswordBearer
+import jwt
+from pydantic import ValidationError
+
 router = APIRouter()
+
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/api/auth/google"
+)
+
+def get_current_user(
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+) -> User:
+    # Handle dev bypass mode
+    if token == "dev-bypass-token":
+        user = db.query(User).first()
+        if user:
+            return user
+        # If no user exists at all, we create a dummy one for the bypass
+        dummy_user = User(id="dev-user-id", email="dev@example.com", name="Dev User")
+        db.add(dummy_user)
+        db.commit()
+        return dummy_user
+        
+    try:
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        token_data = payload.get("sub")
+    except (jwt.PyJWTError, ValidationError):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Could not validate credentials",
+        )
+    user = db.query(User).filter(User.id == token_data).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 class TokenData(BaseModel):
     token: str

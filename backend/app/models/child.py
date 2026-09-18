@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, DateTime, ForeignKey, func, Float, Intege
 from app.db.database import Base
 from sqlalchemy.orm import relationship
 import uuid
+from app.models.user import User
 
 def generate_uuid():
     return str(uuid.uuid4())
@@ -34,6 +35,14 @@ class LearnerModel(Base):
     prediction = Column(Float, default=0.0)
     evidence_finding = Column(Float, default=0.0)
     reading_fluency = Column(Float, default=0.0)
+    
+    # Progress & Adaptive Metrics
+    current_lexile = Column(Integer, default=400) # Starting lexile (approx mid 1st grade)
+    total_words_read = Column(Integer, default=0)
+    total_sessions = Column(Integer, default=0)
+    current_streak_days = Column(Integer, default=0)
+    longest_streak_days = Column(Integer, default=0)
+    last_session_at = Column(DateTime(timezone=True), nullable=True)
     
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

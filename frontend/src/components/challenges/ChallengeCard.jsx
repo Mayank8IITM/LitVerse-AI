@@ -1,12 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 
-export default function ChallengeCard({ question, options, correctAnswer, onComplete, onHintRequest }) {
+export default function ChallengeCard({ question, options, correctAnswer, onComplete, onHintRequest, onError }) {
   const [selected, setSelected] = useState(null);
   const [isWrong, setIsWrong] = useState(false);
+  const [shuffledOptions, setShuffledOptions] = useState([]);
+
+  useEffect(() => {
+    // Shuffle options so correct answer isn't always at index 1
+    const shuffled = [...options].sort(() => Math.random() - 0.5);
+    setShuffledOptions(shuffled);
+  }, [options]);
 
   const handleSelect = (option) => {
     setSelected(option);
@@ -27,8 +34,13 @@ export default function ChallengeCard({ question, options, correctAnswer, onComp
       }, 1500);
     } else {
       setIsWrong(true);
-      // Remove the wrong state after the shake animation completes
-      setTimeout(() => setIsWrong(false), 500);
+      if (onError) onError();
+      
+      // Remove the wrong state after the shake animation completes so they can try again
+      setTimeout(() => {
+        setIsWrong(false);
+        setSelected(null);
+      }, 800);
     }
   };
 
@@ -75,7 +87,7 @@ export default function ChallengeCard({ question, options, correctAnswer, onComp
         style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}
       >
         <AnimatePresence>
-          {options.map((option, idx) => {
+          {shuffledOptions.map((option, idx) => {
             const isSelected = selected === option;
             const isCorrect = isSelected && option === correctAnswer;
             const isIncorrect = isSelected && option !== correctAnswer;

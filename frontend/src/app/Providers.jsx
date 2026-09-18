@@ -2,6 +2,9 @@
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from '@/context/AuthContext';
+import { SettingsProvider } from '@/context/SettingsContext';
+import { GameProvider } from '@/context/GameContext';
+import Navbar from '@/components/layout/Navbar';
 
 export default function Providers({ children }) {
   // In production, this should be set in .env.local
@@ -10,7 +13,12 @@ export default function Providers({ children }) {
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <AuthProvider>
-        {children}
+        <SettingsProvider>
+          <GameProvider>
+            <Navbar />
+            {children}
+          </GameProvider>
+        </SettingsProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   );

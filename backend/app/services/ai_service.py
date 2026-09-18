@@ -13,9 +13,9 @@ class AIService:
         self.groq_keys = settings.groq_keys_list
         self.gemini_keys = settings.gemini_keys_list
 
-    def _execute_with_fallback(self, keys: List[str], call_func: Callable[[str], Any]) -> Any:
+    def _execute_with_fallback(self, keys: List[str], models: List[str], call_func: Callable[[str, str], Any]) -> Any:
         """
-        Executes an AI call and falls back to the next key if a rate limit or error occurs.
+        Executes an AI call and falls back to the next model/key if a rate limit or error occurs.
         Uses a random starting key to distribute load.
         """
         if not keys:
@@ -27,24 +27,24 @@ class AIService:
         
         last_error = None
         for key in available_keys:
-            try:
-                return call_func(key)
-            except Exception as e:
-                logger.warning(f"AI Provider error with key {key[:8]}... : {str(e)}")
-                last_error = e
-                # Fall through to the next key in the loop
-                continue
+            for model_name in models:
+                try:
+                    return call_func(key, model_name)
+                except Exception as e:
+                    logger.warning(f"AI Provider error with key {key[:8]}... and model {model_name}: {str(e)}")
+                    last_error = e
+                    continue
                 
-        logger.error("All AI Provider keys failed.")
+        logger.error("All AI Provider keys and models failed.")
         raise last_error
 
     def get_hint_from_groq(self, question: str, context: str, previous_hints: List[str]) -> str:
         """Uses Groq (Llama 3.1) for fast hint generation."""
-        def _call(api_key: str):
+        def _call(api_key: str, model_name: str):
             client = Groq(api_key=api_key)
             
             system_prompt = (
-                "You are Pip, a magical fox and reading coach. "
+                "You are Pip, an experienced reading coach. "
                 "Provide a short, gentle hint for the user. Do NOT give the direct answer. "
                 "Keep it under 2 sentences."
             )
@@ -56,32 +56,91 @@ class AIService:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
                 ],
-                model="llama-3.1-8b-instant",
+                model=model_name,
                 temperature=0.7,
                 max_tokens=150
             )
             return response.choices[0].message.content
 
-        return self._execute_with_fallback(self.groq_keys, _call)
+        groq_models = ["openai/gpt-oss-20b", "openai/gpt-oss-120b", "qwen/qwen3.8-27b", "groq/compound-mini"]
+        return self._execute_with_fallback(self.groq_keys, groq_models, _call)
 
     def explain_mistake_with_gemini(self, question: str, context: str, wrong_answer: str, correct_answer: str) -> str:
-        """Uses Gemini 2.0 Flash for deeper explanation of mistakes."""
-        def _call(api_key: str):
+        """Uses Gemini 2.5 Flash for deeper explanation of mistakes or vocabulary words."""
+        def _call(api_key: str, model_name: str):
             genai.configure(api_key=api_key)
-            model = genai.GenerativeModel('gemini-2.5-flash')
+            model = genai.GenerativeModel(model_name)
+            
+            if not wrong_answer:
+                # It's a vocabulary definition request
+                prompt = (
+                    f"You are Pip, an experienced reading coach. A child asked you to explain what a word means.\n"
+                    f"Word/Question: {question}\n"
+                    f"Context from the story they are reading: \"{context}\"\n\n"
+                    "Explain the meaning of this word specifically in the context of the story passage provided. "
+                    "Do NOT just give a boring dictionary definition. Use incredibly simple, kid-friendly language. "
+                    "Keep it to 2-3 short sentences. Be encouraging and fun!"
+                )
+            else:
+                # It's a mistake explanation request
+                prompt = (
+                    f"You are Pip, an experienced AI reading coach. The child answered a question incorrectly.\n"
+                    f"Story Context: \"{context}\"\n"
+                    f"Question they were asked: \"{question}\"\n"
+                    f"Their incorrect answer: \"{wrong_answer}\"\n"
+                    f"The correct answer: \"{correct_answer}\"\n\n"
+                    "Briefly explain WHY their answer was wrong and why the correct answer is right, based on the story. "
+                    "Keep it incredibly positive, gentle, and simple for a child to understand. 2-3 sentences max."
+                )
+                
+            response = model.generate_content(prompt)
+            return response.text
+
+        gemini_models = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+        return self._execute_with_fallback(self.gemini_keys, gemini_models, _call)
+
+    def generate_parent_report_with_gemini(self, child_name: str, lexile: int, stats: dict) -> str:
+        """Uses Gemini 2.5 Flash to generate a weekly parent report."""
+        def _call(api_key: str, model_name: str):
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel(model_name)
             
             prompt = (
-                "You are Pip, a magical reading coach for a 7-year-old child. "
-                f"They read this: '{context}'\n"
-                f"The question was: '{question}'\n"
-                f"They guessed: '{wrong_answer}', but the correct answer is: '{correct_answer}'.\n"
-                "Explain why their guess was wrong and why the correct answer is right. "
-                "Use simple words, be encouraging, and keep it under 3 sentences."
+                f"You are Pip, an experienced reading coach. Write a short, encouraging weekly progress report "
+                f"for a parent about their child, {child_name}.\n\n"
+                f"Data:\n"
+                f"- Current Reading Level: {lexile}L\n"
+                f"- Vocabulary Score: {stats['vocabulary']}/100\n"
+                f"- Inference Score: {stats['inference']}/100\n"
+                f"- Literal Comprehension Score: {stats['literal_comprehension']}/100\n\n"
+                "Write exactly one paragraph. Celebrate their strengths, gently note what they are learning, and keep the tone warm, personable, and professional. Also give a suggestion that will help the child improve in their weaker areas."
             )
             
             response = model.generate_content(prompt)
             return response.text
 
-        return self._execute_with_fallback(self.gemini_keys, _call)
+        gemini_models = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+        return self._execute_with_fallback(self.gemini_keys, gemini_models, _call)
+
+    def generate_fluency_feedback(self, target_text: str, transcript: str) -> str:
+        """Uses Gemini 2.5 Flash to generate feedback on pronunciation and fluency."""
+        def _call(api_key: str, model_name: str):
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel(model_name)
+            
+            prompt = (
+                f"You are Pip, an experienced reading coach for children. The child just completed a 60-second reading speedrun.\n"
+                f"Here is the exact text they were supposed to read:\n\"{target_text}\"\n\n"
+                f"Here is what the microphone actually heard them say:\n\"{transcript}\"\n\n"
+                "Compare the two texts. Write a short, helpful feedback message (2-3 sentences max) for the child. "
+                "Point out 1 or 2 specific words they might have mispronounced or skipped based on the transcript. "
+                "Keep it incredibly positive, personable, and fun."
+            )
+            
+            response = model.generate_content(prompt)
+            return response.text
+
+        gemini_models = ["gemini-3.6-flash", "gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-pro"]
+        return self._execute_with_fallback(self.gemini_keys, gemini_models, _call)
 
 ai_service = AIService()

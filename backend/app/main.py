@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, coach
+from app.api import auth, coach, stories, vocab
 
 app = FastAPI(
     title="LitVerse AI Backend",
@@ -24,6 +24,8 @@ app.add_middleware(
 
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(coach.router, prefix="/api/coach", tags=["AI Coach"])
+app.include_router(stories.router, prefix="/api/stories", tags=["Stories"])
+app.include_router(vocab.router, prefix="/api/vocab", tags=["Vocab"])
 
 @app.get("/health", tags=["System"])
 async def health_check():

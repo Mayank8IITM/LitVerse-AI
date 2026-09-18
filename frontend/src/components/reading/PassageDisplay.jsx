@@ -68,7 +68,7 @@ export default function PassageDisplay({ text, vocabularyWords, onWordClick }) {
         lineHeight: '1.8',
         letterSpacing: '0.02em',
         wordSpacing: '0.05em',
-        color: '#f8fafc',
+        color: 'var(--text-primary)',
         maxWidth: '65ch',
         margin: '0 auto',
         position: 'relative'

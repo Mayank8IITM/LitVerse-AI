@@ -77,3 +77,98 @@ async def transcribe_audio(file: UploadFile = File(...)):
             
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
+
+from app.db.database import get_db
+from sqlalchemy.orm import Session
+from app.api.auth import get_current_user
+from app.models.user import User
+from app.models.child import Child, LearnerModel
+
+@router.get("/stats")
+async def get_learner_stats(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """Fast endpoint to fetch stats for the World Map."""
+    child = db.query(Child).filter(Child.parent_id == current_user.id).first()
+    if not child:
+        return {"sessions": 0, "lexile": 200, "name": "Reader"}
+        
+    learner = db.query(LearnerModel).filter(LearnerModel.child_id == child.id).first()
+    if not learner:
+        return {"sessions": 0, "lexile": 200, "name": child.display_name}
+        
+    return {
+        "sessions": learner.total_sessions,
+        "lexile": learner.current_lexile,
+        "name": child.display_name
+    }
+
+@router.get("/report")
+async def get_parent_report(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    """Generate a weekly parent report using Gemini."""
+    child = db.query(Child).filter(Child.parent_id == current_user.id).first()
+    if not child:
+        raise HTTPException(status_code=404, detail="Child profile not found")
+        
+    learner = db.query(LearnerModel).filter(LearnerModel.child_id == child.id).first()
+    if not learner:
+        raise HTTPException(status_code=404, detail="Learner data not found")
+        
+    stats = {
+        "vocabulary": learner.vocabulary,
+        "inference": learner.inference,
+        "literal_comprehension": learner.literal_comprehension
+    }
+    
+    # Calculate real vocabulary distribution
+    from app.models.vocab import VocabWord
+    all_vocab = db.query(VocabWord).filter(VocabWord.child_id == child.id).all()
+    
+    mastered_count = sum(1 for w in all_vocab if w.repetition >= 3)
+    learning_count = sum(1 for w in all_vocab if 0 < w.repetition < 3)
+    struggling_count = sum(1 for w in all_vocab if w.repetition == 0 and w.ease_factor <= 2.5)
+    
+    vocab_distribution = [
+        {"name": "Mastered", "value": mastered_count, "color": "var(--success)"},
+        {"name": "Learning", "value": learning_count, "color": "var(--warning)"},
+        {"name": "Struggling", "value": struggling_count, "color": "var(--danger)"}
+    ]
+    
+    # Top 3 words to practice
+    struggling_words = db.query(VocabWord)\
+        .filter(VocabWord.child_id == child.id)\
+        .order_by(VocabWord.ease_factor.asc(), VocabWord.repetition.asc())\
+        .limit(3).all()
+    words_to_practice = [w.word for w in struggling_words]
+    
+    try:
+        report = ai_service.generate_parent_report_with_gemini(
+            child_name=child.display_name,
+            lexile=learner.current_lexile,
+            stats=stats
+        )
+    except Exception as e:
+        report = "Sorry for the inconvenience, we are using Free APIs and the API limit has been reached. Your child's real-time performance data has still been successfully tracked below."
+
+    return {
+        "report": report,
+        "lexile": learner.current_lexile,
+        "sessions": learner.total_sessions,
+        "stats": stats,
+        "vocab_distribution": vocab_distribution,
+        "words_to_practice": words_to_practice
+    }
+
+class FluencyFeedbackRequest(BaseModel):
+    target_text: str
+    transcript: str
+
+@router.post("/fluency-feedback")
+async def get_fluency_feedback(req: FluencyFeedbackRequest, current_user: User = Depends(get_current_user)):
+    """Generate personalized pronunciation feedback using Gemini."""
+    try:
+        feedback = ai_service.generate_fluency_feedback(
+            target_text=req.target_text,
+            transcript=req.transcript
+        )
+        return {"feedback": feedback}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Feedback generation failed: {str(e)}")

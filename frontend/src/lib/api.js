@@ -19,6 +19,21 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
+    // Global API Limit Handling
+    if (error.response) {
+      const status = error.response.status;
+      const dataStr = JSON.stringify(error.response.data || "").toLowerCase();
+      
+      const isRateLimit = status === 429 || 
+                          (status === 500 && (dataStr.includes('quota') || dataStr.includes('limit') || dataStr.includes('exhausted') || dataStr.includes('429')));
+      
+      if (isRateLimit) {
+        alert("Sorry for the inconvenience. We are using Free APIs and the API limit has been reached. Please try again later!");
+      }
+    } else if (error.message && error.message.toLowerCase().includes('network error')) {
+      console.warn("Network error or CORS issue");
+    }
+    
     return Promise.reject(error);
   }
 );

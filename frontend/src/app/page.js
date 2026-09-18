@@ -34,10 +34,10 @@ export default function Home() {
   };
 
   return (
-    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0f172a', color: '#f8fafc', padding: '2rem' }}>
+    <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--bg-base)', color: 'var(--text-primary)', padding: '2rem' }}>
       <div style={{ textAlign: 'center', maxWidth: '600px' }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem', color: '#fbbf24' }}>ReadQuest AI</h1>
-        <p style={{ fontSize: '1.25rem', marginBottom: '2rem', lineHeight: '1.6' }}>
+        <h1 style={{ fontSize: '4rem', marginBottom: '1rem', color: 'var(--accent)', fontFamily: 'var(--font-display)' }}>LitVerse</h1>
+        <p style={{ fontSize: '1.25rem', marginBottom: '2rem', lineHeight: '1.6', color: 'var(--text-secondary)' }}>
           Step into the Lantern Isles and learn to read by playing the story. Every word you read brings the world to life.
         </p>
         
@@ -52,7 +52,7 @@ export default function Home() {
           />
           <button 
             onClick={handleBypass}
-            style={{ padding: '10px 24px', backgroundColor: '#334155', color: '#f8fafc', border: 'none', borderRadius: '9999px', cursor: 'pointer', fontSize: '1rem', fontWeight: '500' }}
+            style={{ padding: '10px 24px', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border)', borderRadius: '9999px', cursor: 'pointer', fontSize: '1rem', fontWeight: '500', transition: 'all 0.2s' }}
           >
             Bypass Login (Dev Mode)
           </button>

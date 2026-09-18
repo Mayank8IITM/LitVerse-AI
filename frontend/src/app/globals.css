@@ -1,49 +1,376 @@
+/* ============================================
+   LitVerse AI — Design System
+   ============================================ */
+
+/* CSS Custom Properties */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* ---- Storybook Theme (Light/Warm) ---- */
+  --sb-bg-primary: #fef7ed;
+  --sb-bg-secondary: #fdf2e4;
+  --sb-bg-card: #ffffff;
+  --sb-bg-card-hover: #fffbf5;
+  --sb-text-primary: #1c1917;
+  --sb-text-secondary: #57534e;
+  --sb-text-muted: #a8a29e;
+  --sb-accent: #d97706;
+  --sb-accent-hover: #b45309;
+  --sb-accent-soft: rgba(217, 119, 6, 0.1);
+  --sb-success: #059669;
+  --sb-success-soft: rgba(5, 150, 105, 0.1);
+  --sb-danger: #dc2626;
+  --sb-danger-soft: rgba(220, 38, 38, 0.1);
+  --sb-warning: #eab308;
+  --sb-warning-soft: rgba(234, 179, 8, 0.1);
+  --sb-primary: #3b82f6;
+  --sb-secondary: #8b5cf6;
+  --sb-info: #0ea5e9;
+  --sb-border: #e7e5e4;
+  --sb-shadow: 0 4px 6px -1px rgba(28, 25, 23, 0.07), 0 2px 4px -2px rgba(28, 25, 23, 0.05);
+  --sb-shadow-lg: 0 10px 15px -3px rgba(28, 25, 23, 0.08), 0 4px 6px -4px rgba(28, 25, 23, 0.05);
+  --sb-glow: 0 0 20px rgba(217, 119, 6, 0.15);
+
+  /* ---- Dark Mode Theme ---- */
+  --dk-bg-primary: #0f172a;
+  --dk-bg-secondary: #1e293b;
+  --dk-bg-card: #1e293b;
+  --dk-bg-card-hover: #263548;
+  --dk-text-primary: #f8fafc;
+  --dk-text-secondary: #cbd5e1;
+  --dk-text-muted: #64748b;
+  --dk-accent: #fbbf24;
+  --dk-accent-hover: #f59e0b;
+  --dk-accent-soft: rgba(251, 191, 36, 0.1);
+  --dk-success: #10b981;
+  --dk-success-soft: rgba(16, 185, 129, 0.1);
+  --dk-danger: #ef4444;
+  --dk-danger-soft: rgba(239, 68, 68, 0.1);
+  --dk-warning: #facc15;
+  --dk-warning-soft: rgba(250, 204, 21, 0.1);
+  --dk-primary: #60a5fa;
+  --dk-secondary: #a78bfa;
+  --dk-info: #38bdf8;
+  --dk-border: #334155;
+  --dk-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
+  --dk-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -4px rgba(0, 0, 0, 0.3);
+  --dk-glow: 0 0 20px rgba(251, 191, 36, 0.15);
+
+  /* ---- Active theme variables (default: dark) ---- */
+  --bg-primary: var(--dk-bg-primary);
+  --bg-secondary: var(--dk-bg-secondary);
+  --bg-card: var(--dk-bg-card);
+  --bg-card-hover: var(--dk-bg-card-hover);
+  --text-primary: var(--dk-text-primary);
+  --text-secondary: var(--dk-text-secondary);
+  --text-muted: var(--dk-text-muted);
+  --accent: var(--dk-accent);
+  --accent-hover: var(--dk-accent-hover);
+  --accent-soft: var(--dk-accent-soft);
+  --success: var(--dk-success);
+  --success-soft: var(--dk-success-soft);
+  --danger: var(--dk-danger);
+  --danger-soft: var(--dk-danger-soft);
+  --warning: var(--dk-warning);
+  --warning-soft: var(--dk-warning-soft);
+  --primary: var(--dk-primary);
+  --secondary: var(--dk-secondary);
+  --info: var(--dk-info);
+  --border: var(--dk-border);
+  --shadow: var(--dk-shadow);
+  --shadow-lg: var(--dk-shadow-lg);
+  --glow: var(--dk-glow);
+
+  /* ---- Spacing ---- */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+
+  /* ---- Typography ---- */
+  --font-display: var(--font-outfit), 'Segoe UI', sans-serif;
+  --font-body: var(--font-inter), 'Segoe UI', sans-serif;
+  --font-reading: var(--font-literata), Georgia, serif;
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* ---- Transitions ---- */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Storybook theme class */
+[data-theme="storybook"] {
+  --bg-primary: var(--sb-bg-primary);
+  --bg-secondary: var(--sb-bg-secondary);
+  --bg-card: var(--sb-bg-card);
+  --bg-card-hover: var(--sb-bg-card-hover);
+  --text-primary: var(--sb-text-primary);
+  --text-secondary: var(--sb-text-secondary);
+  --text-muted: var(--sb-text-muted);
+  --accent: var(--sb-accent);
+  --accent-hover: var(--sb-accent-hover);
+  --accent-soft: var(--sb-accent-soft);
+  --success: var(--sb-success);
+  --success-soft: var(--sb-success-soft);
+  --danger: var(--sb-danger);
+  --danger-soft: var(--sb-danger-soft);
+  --warning: var(--sb-warning);
+  --warning-soft: var(--sb-warning-soft);
+  --primary: var(--sb-primary);
+  --secondary: var(--sb-secondary);
+  --info: var(--sb-info);
+  --border: var(--sb-border);
+  --shadow: var(--sb-shadow);
+  --shadow-lg: var(--sb-shadow-lg);
+  --glow: var(--sb-glow);
+}
+
+/* ============================================
+   Base Reset & Globals
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 html {
-  height: 100%;
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  min-height: 100%;
-  display: flex;
-  flex-direction: column;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color var(--transition-base), color var(--transition-base);
+  line-height: 1.6;
+  min-height: 100vh;
 }
 
 a {
-  color: inherit;
+  color: var(--accent);
   text-decoration: none;
+  transition: color var(--transition-fast);
+}
+a:hover {
+  color: var(--accent-hover);
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+/* ============================================
+   Scrollbar Styling
+   ============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+.container-narrow {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 var(--space-xl);
+}
+
+/* ============================================
+   Button System
+   ============================================ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 0.625rem 1.25rem;
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  white-space: nowrap;
+  user-select: none;
+}
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  box-shadow: var(--glow);
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+}
+.btn-secondary:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+.btn-ghost:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.btn-pill {
+  border-radius: var(--radius-full);
+  padding: 0.75rem 2rem;
+}
+
+.btn-lg {
+  padding: 0.875rem 1.75rem;
+  font-size: 1.0625rem;
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border-radius: var(--radius-md);
+}
+
+/* ============================================
+   Card System
+   ============================================ */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  transition: all var(--transition-base);
+}
+
+.card-interactive:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.card-glow {
+  border-color: var(--accent);
+  box-shadow: var(--glow);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes lanternGlow {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 8px rgba(251, 191, 36, 0.3)); }
+  50% { filter: brightness(1.15) drop-shadow(0 0 16px rgba(251, 191, 36, 0.5)); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, var(--accent-soft), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-lantern {
+  animation: lanternGlow 3s ease-in-out infinite;
+}
+
+/* Stagger children animations */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeIn 0.5s ease-out forwards;
+}
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.3s; }
+
+/* ============================================
+   Page Transitions
+   ============================================ */
+
+.page-enter {
+  animation: fadeIn 0.4s ease-out;
 }
