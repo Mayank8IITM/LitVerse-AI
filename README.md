@@ -44,10 +44,32 @@ Our platform was built on the foundation of the latest educational and cognitive
 * **AI Integration**: Google Generative AI (Gemini) + Groq API
 * **Engine**: Custom AdaptiveEngine and StoryEngine for ZPD calculations and prompt generation.
 
+
+**Deployed on Amazon AWS Ec2 Instance** 
+
 ---
 
 ## Quick Start Guide
 
+## Microphone Access
+
+The **Reading Fluency** feature requires microphone access to analyze spoken reading. Since the application runs over HTTP, browsers may block microphone permissions.
+
+### Chrome Testing Instructions
+
+1. Type `chrome://flags/#unsafely-treat-insecure-origin-as-secure` on Chrome browser
+2. Add: http://ec2-3-90-184-59.compute-1.amazonaws.com:3000
+3. Set to **Enabled** and click **Relaunch**.
+4. Reopen the website and allow microphone access.
+
+<img width="1856" height="456" alt="image" src="https://github.com/user-attachments/assets/f1246f69-2b13-444a-8ae7-c633be57219c" />
+   
+### Live Website
+
+[Visit the Live Website](http://ec2-3-90-184-59.compute-1.amazonaws.com:3000)
+
+
+## Deployment
 You can run LitVerse locally for development, or deploy it instantly using Docker.
 
 ### 1. Prerequisites
